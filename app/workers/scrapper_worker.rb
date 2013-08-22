@@ -1,13 +1,14 @@
-require 'sidekiq'
+# require 'sidekiq'
 require 'scrapper'
+require 'uri'
 
 class ScrapperWorker
 
   def perform
     begin
-      @wiki_scrapper = Scrapper::WikipediaScrapper.new(15)
+      @wiki_scrapper = Scrapper::Runner.new(async_no: 15)
 
-      p "Fetching pages..."
+      p "Fetchin' pages..."
 
       Page.transaction do
         @pages = Page.wiki.waiting.limit(50).lock(true)
@@ -16,7 +17,7 @@ class ScrapperWorker
 
       p "Scrappin'..."
 
-      @wiki_scrapper.scrap(@pages.map(&:url))
+      @wiki_scrapper.scrap(@pages.map(&:url)) { |u| u =~ /en\.wikipedia\.org\/wiki/ }
 
       p "Updatin'..."
 
@@ -32,8 +33,8 @@ class ScrapperWorker
   end
 
   def update_existing_pages
-    @_processed_urls = @wiki_scrapper.responses.map { |r| r.url }
-    @_error_urls  = @wiki_scrapper.errors.map { |r| r.url }
+    @processed_urls = @wiki_scrapper.responses.map { |r| r.url }
+    @error_urls  = @wiki_scrapper.errors.map { |r| r.url }
 
     @pages.each do |page|
       res = scrapping_result(page)
@@ -46,9 +47,21 @@ class ScrapperWorker
     end
   end
 
+  def insert_hosts
+    robot_hosts = Robot.pluck(:host)
+    received_hosts = (@processed_urls + @error_urls).map { |u| URI.parse(u).host }
+    new_hosts = []
+
+    (received_hosts - robot_hosts).each do |host|
+      new_hosts << Robot.new(host: host)
+    end
+
+    Robot.import(new_hosts)
+  end
+
   def insert_new_urls
     pages = []
-    @wiki_scrapper.urls.each do |url|
+    @wiki_scrapper.urls.uniq.each do |url|
       pages << Page.new(url: url, status: "waiting")
     end
     Page.import(pages)
@@ -56,7 +69,7 @@ class ScrapperWorker
 
   def add_data_to_page(page, response)
     context = ScrappingContext.find_or_create_by(:name => "wikipedia")
-    page.contexts << context
+    page.scrapping_contexts << context
 
     return unless response.is_a?(Scrapper::Response)
 

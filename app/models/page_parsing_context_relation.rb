@@ -3,7 +3,7 @@ class PageScrappingContextRelation < ActiveRecord::Base
   belongs_to :parsing_context
 
   validates :page_id, :presence => true
-  validates :parsing_context_id, :presence => true
-  validates :page_id, uniqueness: { scope: :parsing_context_id }
+  validates :scrapping_context_id, :presence => true
+  validates :page_id, uniqueness: { scope: :scrapping_context_id }
 
 end
