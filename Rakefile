@@ -13,6 +13,12 @@ namespace :db do
     ActiveRecord::Migrator.migrate("db/migrate/")
   end
 
+  task :rollback do
+    connection_details = YAML::load(File.open('config/database.yml'))
+    ActiveRecord::Base.establish_connection(connection_details)
+    ActiveRecord::Migrator.rollback("db/migrate/")
+  end
+
   desc "Create the db"
   task :create do
     connection_details = YAML::load(File.open('config/database.yml'))
