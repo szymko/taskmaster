@@ -4,4 +4,6 @@ class PageContent < ActiveRecord::Base
 
   validates :body, :presence => true
   validates :status_code, :presence => true
+
+  scope :not_published, -> { PageContent.where(published: false) }
 end

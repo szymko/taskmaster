@@ -15,3 +15,4 @@ gem 'pg'
 gem 'pry'
 
 gem 'neo4j-cypher', '~> 1.0.0'
+gem 'bunny', '>= 0.10.0'

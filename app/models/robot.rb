@@ -1,3 +1,4 @@
+require 'uri'
 require 'scrapper'
 
 class Robot < ActiveRecord::Base
@@ -5,5 +6,4 @@ class Robot < ActiveRecord::Base
   validates :host, uniqueness: true
   validates :rules, presence: true
 
-  attr_accessible :host, :rules
 end

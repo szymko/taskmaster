@@ -33,8 +33,8 @@ class ScrapperWorker
   end
 
   def update_existing_pages
-    @processed_urls = @wiki_scrapper.responses.map { |r| r.url }
-    @error_urls  = @wiki_scrapper.errors.map { |r| r.url }
+    @processed_urls = @wiki_scrapper.responses.map { |r| URI.parse(r.url) }
+    @error_urls  = @wiki_scrapper.errors.map { |r| URI.parse(r.url) }
 
     @pages.each do |page|
       res = scrapping_result(page)
@@ -49,14 +49,17 @@ class ScrapperWorker
 
   def insert_hosts
     robot_hosts = Robot.pluck(:host)
-    received_hosts = (@processed_urls + @error_urls).map { |u| URI.parse(u).host }
-    new_hosts = []
+    received_hosts = (@processed_urls + @error_urls).map { |u| u.host }.uniq
+    new_hosts = download_robots(received_hosts - robot_hosts)
+    new_robots = []
 
-    (received_hosts - robot_hosts).each do |host|
-      new_hosts << Robot.new(host: host)
-    end
-
+    new_hosts.each { |host, files| new_robots << Robot.new(host: host, rules: files) }
     Robot.import(new_hosts)
+  end
+
+  def download_robots(hosts)
+    robots = Scrapper::Robots.new
+    robots.get_raw(hosts).files
   end
 
   def insert_new_urls

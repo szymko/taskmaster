@@ -7,7 +7,7 @@ end
 
 @worker = ScrapperWorker.new
 
-3.times do
+2.times do
   # binding.pry
   @worker.perform
 end
