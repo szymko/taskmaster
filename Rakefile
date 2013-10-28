@@ -3,6 +3,11 @@ require_relative './app/app'
 require 'pg'
 require 'active_record'
 require 'yaml'
+require "rake/testtask"
+
+Rake::TestTask.new do |t|
+  t.pattern = "./test/**/*_test.rb"
+end
 
 namespace :db do
 
@@ -22,8 +27,8 @@ namespace :db do
   desc "Create the db"
   task :create do
     connection_details = YAML::load(File.open('config/database.yml'))
-    admin_connection = connection_details.merge({'database'=> 'postgres', 
-                                                'schema_search_path'=> 'public'}) 
+    admin_connection = connection_details.merge({'database'=> 'postgres',
+                                                'schema_search_path'=> 'public'})
     ActiveRecord::Base.establish_connection(admin_connection)
     ActiveRecord::Base.connection.create_database(connection_details.fetch('database'))
   end

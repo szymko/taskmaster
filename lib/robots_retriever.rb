@@ -1,10 +1,10 @@
 class RobotsRetriever
-  def initialize
-    @robots = Scrapper::Robots.new
+  def initialize(robots)
+    @robots = robots
   end
 
   def allowed?(uri, agent)
-    parse()
+    @robots.parse()
 
     unless @robots.has?(uri.host)
       @robots.add(uri.host => Robot.find_by(host: uri.host))
@@ -16,9 +16,5 @@ class RobotsRetriever
   def add_robots(host)
     @robots.get([host], raw: true)
     Robot.create(host: host, rules: @robots.raw[:host])
-  end
-
-  def parse
-    @robots.parse()
   end
 end

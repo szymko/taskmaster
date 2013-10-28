@@ -1,4 +1,3 @@
-# require 'sidekiq'
 require 'scrapper'
 require 'uri'
 
@@ -6,7 +5,7 @@ class ScrapperWorker
 
   def perform
     begin
-      @wiki_scrapper = Scrapper::Runner.new(async_no: 15)
+      @scrapper = Scrapper::Crawler.new(async: 15)
 
       p "Fetchin' pages..."
 
@@ -15,16 +14,20 @@ class ScrapperWorker
         @pages.each { |p| p.mark_as("running")}
       end
 
+      p "Downloadin'..."
+
+      @wiki.get(@pages.map(&:url))
+
       p "Scrappin'..."
 
-      @wiki_scrapper.scrap(@pages.map(&:url)) { |u| u =~ /en\.wikipedia\.org\/wiki/ }
+      @wiki.scrap() { |u| u =~ /en\.wikipedia\.org\/wiki/ }
 
       p "Updatin'..."
 
-      update_existing_pages
+      update_existing_pages()
 
       p "Insertin'..."
-      insert_new_urls
+      insert_new_urls()
 
     rescue Exception => e
       p "Rescuin'..."
@@ -32,7 +35,7 @@ class ScrapperWorker
     end
   end
 
-  def update_existing_pages
+  def update_existing_pages()
     @processed_urls = @wiki_scrapper.responses.map { |r| URI.parse(r.url) }
     @error_urls  = @wiki_scrapper.errors.map { |r| URI.parse(r.url) }
 

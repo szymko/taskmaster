@@ -8,7 +8,6 @@ end
 @worker = ScrapperWorker.new
 
 2.times do
-  # binding.pry
   @worker.perform
 end
 
