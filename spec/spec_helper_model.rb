@@ -3,9 +3,7 @@ require 'yaml'
 require 'active_record'
 
 # ActiveRecord
-ActiveRecord::Base.establish_connection(
-    YAML.load(File.read('config/database.yml'))
-)
+Connection.establish('test')
 
 # factory_girl
 require_relative 'support/factory_girl'

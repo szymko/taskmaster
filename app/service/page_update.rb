@@ -1,5 +1,16 @@
 class PageUpdate
 
+  def fetch(**opts)
+    subset = opts[:subset] || Page
+    pages = []
+
+    Page.transaction do
+      pages = subset.waiting.limit(opts[:number]).lock
+      pages.each { |p| p.mark_as("running") } if pages
+    end
+
+    pages
+  end
 #  def update_existing()
 #    @processed_urls = @wiki_scrapper.responses.map { |r| URI.parse(r.url) }
 #    @error_urls  = @wiki_scrapper.errors.map { |r| URI.parse(r.url) }

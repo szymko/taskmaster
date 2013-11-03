@@ -25,7 +25,7 @@ describe PageUpdate do
         5.times { FactoryGirl.create(:page, status: "waiting") }
         pu = PageUpdate.new
 
-        expect(pu.fetch(3).length).to eq(3)
+        expect(pu.fetch(number: 3).length).to eq(3)
       end
 
       it "fetches a specific page" do
@@ -33,7 +33,7 @@ describe PageUpdate do
                             url: "http://www.example.com")
         pu = PageUpdate.new
 
-        expect(pu.fetch(1).flatten.url).to eq("http://www.example.com")
+        expect(pu.fetch(number: 1).first.url).to eq("http://www.example.com")
       end
 
       it "changes the status to 'running'" do
@@ -41,7 +41,17 @@ describe PageUpdate do
                             url: "http://www.example.com")
         pu = PageUpdate.new
 
-        expect(pu.fetch(1).flatten.status).to eq("running")
+        expect(pu.fetch(number: 1).first.status).to eq("running")
+      end
+
+      it "fetches from a subset" do
+        FactoryGirl.create(:page, status: "waiting")
+        FactoryGirl.create(:page, status: "waiting",
+                            url: "http://www.instance.com")
+        pu = PageUpdate.new
+        subset = Page.where(url: "http://www.instance.com")
+
+        expect(pu.fetch(number: 2, subset: subset).length).to eq(1)
       end
     end
   end
