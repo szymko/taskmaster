@@ -3,11 +3,11 @@ require_relative './app/app'
 require 'pg'
 require 'active_record'
 require 'yaml'
-require "rake/testtask"
+#require "rake/testtask"
 
-Rake::TestTask.new do |t|
-  t.pattern = "./test/**/*_test.rb"
-end
+#Rake::TestTask.new do |t|
+ # t.pattern = "./test/**/*_test.rb"
+#end
 
 namespace :db do
 
