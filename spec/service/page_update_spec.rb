@@ -2,11 +2,6 @@ require 'ostruct'
 require_relative './../spec_helper'
 require_relative './../spec_helper_model'
 
-#p = PageUpdate.new()
-#pages = p.fetch(number: 10)
-#p.update(pages: pages, responses: responses, errors: errors, context: "wikipedia")
-#p.insert(urls: new_urls)
-
 describe PageUpdate do
 
   context "given db is empty" do
@@ -15,7 +10,23 @@ describe PageUpdate do
     end
 
     describe "#insert" do
-      it { expect(subject.insert(urls: ["http://www.example.com/"])).to change{ Page.count }.by(1) }
+      it { expect { subject.insert(urls: ["http://www.example.com/"]) }.to change{ Page.count }.by(1) }
+
+      it { expect { subject.insert(urls: ["/example.com/"]) }.to_not change{ Page.count } }
+
+      it "performs validations" do
+        FactoryGirl.create(:page, url: "http://www.s.com/")
+        expect { subject.insert(urls: ["http://www.s.com/"]) }.to_not change { Page.count }
+      end
+
+      it "inserts unique urls" do
+        expect { subject.insert(urls: Array.new(2, "http://www.s.co")) }.to change { Page.count }.by(1)
+      end
+
+      it "adds slashes to urls" do
+        subject.insert(urls: ["http://www.s.com"])
+        expect(Page.last.url).to eq("http://www.s.com/")
+      end
     end
   end
 
@@ -23,35 +34,35 @@ describe PageUpdate do
     describe "#fetch" do
       it "fetches requested number of pages" do
         5.times { FactoryGirl.create(:page, status: "waiting") }
-        pu = PageUpdate.new
+        page_update = PageUpdate.new
 
-        expect(pu.fetch(number: 3).length).to eq(3)
+        expect(page_update.fetch(number: 3).length).to eq(3)
       end
 
       it "fetches a specific page" do
         FactoryGirl.create(:page, status: "waiting",
                             url: "http://www.example.com")
-        pu = PageUpdate.new
+        page_update = PageUpdate.new
 
-        expect(pu.fetch(number: 1).first.url).to eq("http://www.example.com")
+        expect(page_update.fetch(number: 1).first.url).to eq("http://www.example.com")
       end
 
       it "changes the status to 'running'" do
         FactoryGirl.create(:page, status: "waiting",
                             url: "http://www.example.com")
-        pu = PageUpdate.new
+        page_update = PageUpdate.new
 
-        expect(pu.fetch(number: 1).first.status).to eq("running")
+        expect(page_update.fetch(number: 1).first.status).to eq("running")
       end
 
       it "fetches from a subset" do
         FactoryGirl.create(:page, status: "waiting")
         FactoryGirl.create(:page, status: "waiting",
                             url: "http://www.instance.com")
-        pu = PageUpdate.new
+        page_update = PageUpdate.new
         subset = Page.where(url: "http://www.instance.com")
 
-        expect(pu.fetch(number: 2, subset: subset).length).to eq(1)
+        expect(page_update.fetch(number: 2, subset: subset).length).to eq(1)
       end
     end
   end
@@ -61,24 +72,22 @@ describe PageUpdate do
     describe "#update" do
 
       it "updates page" do
-        p = FactoryGirl.create(:page, status: "waiting")
-        pu = PageUpdate.new
+        page = FactoryGirl.create(:page, status: "waiting")
+        page_update = PageUpdate.new
 
-        pu.update(pages: p, responses: response(url: p.url), context: "test")
-        expect(p.status).to eq("success")
-        expect(p.scrapping_contexts.first.name).to eq("test")
+        page_update.update(pages: [page], responses: [response(url: page.url)])
+        expect(page.status).to eq("success")
       end
 
       it "updates page_content" do
-        p = FactoryGirl.create(:page, status: "waiting")
-        pu = PageUpdate.new
-        r = response(url: p.url)
+        page = FactoryGirl.create(:page, status: "waiting")
+        page_update = PageUpdate.new
+        response = response(url: page.url)
 
-        pu.update(pages: p, responses: r, context: "test")
-        pc = page.scrapping_contexts.first.page_contents.first
+        page_update.update(pages: [page], responses: [response])
 
-        expect(pc.body).to eq(r.body)
-        expect(pc.status_code).to eq(r.status_code)
+        expect(page.page_content.body).to eq(response.body)
+        expect(page.page_content.status_code).to eq(response.status_code)
       end
     end
   end
@@ -86,12 +95,11 @@ describe PageUpdate do
   context "given error" do
     describe "#update" do
       it "updates page" do
-        p = FactoryGirl.create(:page, status: "waiting")
-        pu = PageUpdate.new
+        page = FactoryGirl.create(:page, status: "waiting")
+        page_update = PageUpdate.new
 
-        pu.update(pages: p, errors: error(url: p.url), context: "test")
-        expect(p.status).to eq("error")
-        expect(ScrappingContext.count).to eq(0)
+        page_update.update(pages: [page], errors: [error(url: page.url)])
+        expect(page.status).to eq("error")
       end
     end
   end

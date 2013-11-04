@@ -1,10 +1,5 @@
 class Page < ActiveRecord::Base
-  has_many :page_scrapping_context_relations
-  has_many :page_parsing_context_relations
-  has_many :scrapping_contexts, :through => :page_scrapping_context_relations
-  has_many :parsing_contexts, :through => :page_parsing_context_relations
-
-  has_many :contents, :class_name => "PageContent", :dependent => :destroy
+  has_one :page_content, :class_name => "PageContent", :dependent => :destroy
 
   validates :url, :presence => true
   validates :url, :uniqueness => true

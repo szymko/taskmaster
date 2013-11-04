@@ -1,4 +1,4 @@
-class AddPublishedFieldToPageContent < ActiveRecord::Migration
+class AddPublishedFieldToPageContents < ActiveRecord::Migration
   def change
     change_table :page_contents do |t|
       t.boolean :published, default: false

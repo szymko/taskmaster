@@ -6,6 +6,5 @@ FactoryGirl.define do
     status_code "200"
 
     page
-    scrapping_context
   end
 end

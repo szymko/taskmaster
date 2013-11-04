@@ -1,5 +1,4 @@
 require 'bundler/setup'
-require 'pg'
 require_relative './app/app'
 
 namespace :db do
@@ -7,6 +6,7 @@ namespace :db do
   desc "Migrate the db"
   task :migrate do
     Connection.establish()
+    p Page.inspect
     ActiveRecord::Migrator.migrate("db/migrate/")
   end
 
