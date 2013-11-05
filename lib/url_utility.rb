@@ -8,4 +8,9 @@ module UrlUtility
   def self.equal?(url1, url2)
     add_slash(url1) == add_slash(url2)
   end
+
+  def self.remove_fragment(url)
+    url.gsub(/#.*$/,'')
+  end
+
 end

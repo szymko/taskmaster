@@ -14,4 +14,8 @@ describe UrlUtility do
 
     it { expect(UrlUtility.equal?("http://www.e.com", "http://www.f.com")).to be_false }
   end
+
+  describe '.remove_fragment' do
+    it { expect(UrlUtility.remove_fragment("http://www.e.com#1")).to eq("http://www.e.com") }
+  end
 end

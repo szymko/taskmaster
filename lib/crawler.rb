@@ -6,8 +6,6 @@ class Crawler
 
   extend Forwardable
 
-  ASYNC = 10
-
   def initialize(opts) #opts = { agent: "Required", engine: ..., robots: ...}
 
     @engine, @robots = build(opts)
@@ -16,7 +14,12 @@ class Crawler
 
   def get(*urls)
     selected = urls.flatten.select do |u|
-      @robots.allowed?(url: u, agent: @agent, download: true)
+      begin
+        @robots.allowed?(url: u, agent: @agent, download: true)
+      rescue Exception => e
+        TaskLogger.log_exception(exception: e, url: u)
+        raise e
+      end
     end
 
     @engine.get(selected)
@@ -24,7 +27,12 @@ class Crawler
 
   def scrap(pattern)
     @engine.scrap do |u|
-      (u =~ pattern) && @robots.allowed?(url: u, agent: @agent, download: true)
+      begin
+        (u =~ pattern) && @robots.allowed?(url: u, agent: @agent, download: true)
+      rescue Exception => e
+        TaskLogger.log_exception(exception: e, url: u)
+        raise e
+      end
     end
   end
 
@@ -32,7 +40,7 @@ class Crawler
 
   def build(opts)
     engine = opts[:engine] ||
-              Scrapper::Crawler.new(async: ASYNC, user_agent: opts[:agent])
+              Scrapper::Crawler.new(async: TaskmasterConfig[:crawler][:connections], user_agent: opts[:agent])
     robots = opts[:robots] || Robots::Index.new()
 
     [engine, robots]

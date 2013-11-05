@@ -1,13 +1,12 @@
 require 'bundler/setup'
-#require 'active_record'
-#require 'activerecord-import'
-#require 'activerecord-import/base'
 require 'scrapper'
 require_relative 'connection'
 Connection.establish()
 
-PROJECT_ROOT = File.dirname(File.absolute_path(__FILE__))
-Dir.glob(PROJECT_ROOT + "/models/*.rb").each { |f| require f }
-Dir.glob(PROJECT_ROOT + "/../lib/*.rb").each { |f| require f }
-Dir.glob(PROJECT_ROOT + "/service/*.rb").each { |f| require f }
-Dir.glob(PROJECT_ROOT + "/workers/*.rb").each { |f| require f }
+PROJECT_ROOT = File.dirname(File.join(File.dirname(__dir__), '/../'))
+Dir.glob(PROJECT_ROOT + "/app/models/*.rb").each { |f| require f }
+Dir.glob(PROJECT_ROOT + "/lib/*.rb").each { |f| require f }
+Dir.glob(PROJECT_ROOT + "/app/service/*.rb").each { |f| require f }
+Dir.glob(PROJECT_ROOT + "/app/workers/*.rb").each { |f| require f }
+
+TaskmasterConfig = YAML.load_file(PROJECT_ROOT + '/config/config.yml').deep_symbolize_keys

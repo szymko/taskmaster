@@ -1,0 +1,6 @@
+crawler:
+  connections: 20
+  fetch_limit: 20
+logger:
+  file: 'log/development.log'
+  enabled: true

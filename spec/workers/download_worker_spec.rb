@@ -8,7 +8,7 @@ describe DownloadWorker do
         res = response
         crawl =  crawler(scrap: ["http://www.e.com"], responses: [res], errors: [])
         pu = page_update(fetch: [page])
-        worker = DownloadWorker.new(pu, crawl)
+        worker = DownloadWorker.new(page_update: pu, crawler: crawl)
 
         worker.perform(subset: Page.wiki, pattern: /.*/)
         expect(pu).to have_received(:fetch).with({ subset: Page.wiki, number: 50})

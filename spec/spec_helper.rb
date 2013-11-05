@@ -3,5 +3,7 @@
 
 require_relative '../app/app'
 
+TaskmasterConfig[:logger][:enabled] = false
+
 module SpecHelper
 end

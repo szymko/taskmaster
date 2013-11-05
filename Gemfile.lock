@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/szymko/scrapper.git
-  revision: d67a5e1c7f47bf539af5f92a705c1655f07fa1d6
+  revision: 68ebf422ee3bfdfb239a396573595804321efc90
   specs:
     scrapper (0.0.1)
       em-http-request (= 1.1.0)
@@ -10,18 +10,18 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    activemodel (4.0.1.rc3)
-      activesupport (= 4.0.1.rc3)
+    activemodel (4.0.1)
+      activesupport (= 4.0.1)
       builder (~> 3.1.0)
-    activerecord (4.0.1.rc3)
-      activemodel (= 4.0.1.rc3)
+    activerecord (4.0.1)
+      activemodel (= 4.0.1)
       activerecord-deprecated_finders (~> 1.0.2)
-      activesupport (= 4.0.1.rc3)
+      activesupport (= 4.0.1)
       arel (~> 4.0.0)
     activerecord-deprecated_finders (1.0.3)
     activerecord-import (0.4.1)
       activerecord (>= 3.0)
-    activesupport (4.0.1.rc3)
+    activesupport (4.0.1)
       i18n (~> 0.6, >= 0.6.4)
       minitest (~> 4.2)
       multi_json (~> 1.3)
@@ -33,8 +33,8 @@ GEM
     atomic (1.1.14)
     atomic (1.1.14-java)
     builder (3.1.4)
-    bunny (0.10.8)
-      amq-protocol (>= 1.6.0)
+    bunny (1.0.0)
+      amq-protocol (>= 1.8.0)
     coderay (1.0.9)
     cookiejar (0.3.0)
     database_cleaner (1.2.0)
@@ -49,9 +49,9 @@ GEM
       eventmachine (>= 1.0.0.beta.4)
     eventmachine (1.0.3)
     eventmachine (1.0.3-java)
-    factory_girl (4.2.0)
+    factory_girl (4.3.0)
       activesupport (>= 3.0.0)
-    ffi (1.9.0-java)
+    ffi (1.9.3-java)
     http_parser.rb (0.6.0.beta.2)
     http_parser.rb (0.6.0.beta.2-java)
     i18n (0.6.5)

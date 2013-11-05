@@ -41,7 +41,6 @@ namespace :db do
   desc "Destroy pages, page_contents, contexts and page_contexts"
   task :destroy do
     Page.destroy_all
-    Context.destroy_all
-    PageContextRelation.destroy_all
+    PageContent.destroy_all
   end
 end

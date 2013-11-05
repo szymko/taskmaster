@@ -4,10 +4,11 @@ class PageUpdate
 
   def fetch(**opts)
     subset = opts[:subset] || Page
+    number = opts[:number] || TaskmasterConfig[:crawler][:fetch_limit]
     pages = []
 
     Page.transaction do
-      pages = subset.waiting.limit(opts[:number]).lock
+      pages = subset.waiting.limit(number).lock
       pages.each { |p| p.mark_as("running") } if pages
     end
 
@@ -15,10 +16,13 @@ class PageUpdate
   end
 
   def insert(urls: [])
-    pages = urls.map { |u| UrlUtility.add_slash(u) }.uniq.inject([]) do |p, u|
+    uniform_urls = urls.map { |u| UrlUtility.add_slash(UrlUtility.remove_fragment(u)) }
+    pages = uniform_urls.uniq.inject([]) do |p, u|
       p << Page.new(url: u) unless URI(u).relative?
       p
     end
+
+    pages.map { |p| p.mark_as("waiting") }
 
     Page.import(pages)
   end
@@ -26,20 +30,12 @@ class PageUpdate
   def update(pages: [], responses: [], errors: [])
     pages.each do |p|
       res = responses.find { |r| p.url == r.url.to_s }
-      res ? insert_response(p, res) : insert_error(p)
+      success?(res) ? insert_response(p, res) : insert_error(p, res)
       p.save
     end
   end
 
   private
-
-  def insert_result(page, result)
-    if result.is_a?(Scrapper::RequestError) || result.nil?
-      insert_error(page)
-    else
-      insert_response(page, result)
-    end
-  end
 
   def insert_response(page, response)
     page.mark_as("success")
@@ -47,8 +43,17 @@ class PageUpdate
                              status_code: response.status_code)
   end
 
-  def insert_error(page)
+  def insert_error(page, response)
+    status_code = response && response.status_code
+    msg = "Page update error with url: #{page.url} "\
+           "and status_code: #{status_code}."
+
     page.mark_as("error")
+    TaskLogger.log(level: :warn, msg: msg)
+  end
+
+  def success?(response)
+    response && (response.status_code.to_s =~ /(1|2|3)\d{2}/)
   end
 #
 #  p = PageUpdate.new()
