@@ -1,6 +1,7 @@
 crawler:
   connections: 20
   fetch_limit: 20
+  url_pattern: '\/\/en\.wikipedia\.org(?!\/wiki\/User)'
 logger:
   file: 'log/development.log'
   enabled: true

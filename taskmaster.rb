@@ -1,17 +1,36 @@
 require_relative './app/app.rb'
 require 'pry'
 
+interrupt = false
+interrupt_co = 0
+trap("SIGINT") do
+  interrupt_co += 1
+  if interrupt_co == 1
+    puts "\nPlease wait for graceful exit, or press CTRL+C to leave now."
+    interrupt = true
+  elsif interrupt_co > 1
+    exit!
+  end
+end
+
+
 unless Page.find_by(url: "http://en.wikipedia.org/wiki/Main_Page")
   Page.create(url: "http://en.wikipedia.org/wiki/Main_Page", status: "waiting")
 end
 
-crawler = Crawler.new(agent: "Pszemek")
-page_update = PageUpdate.new
+commands = [FetchPages.new(subset: Page.wiki),
+            GetPages.new(),
+            ScrapUrls.new(pattern: Regexp.compile(TaskmasterConfig[:crawler][:url_pattern])),
+            InsertPages.new(),
+            UpdatePages.new()]
 
-@worker = DownloadWorker.new(page_update: page_update, crawler: crawler)
+@worker = DownloadWorker.new(commands)
 
-3.times do
-  @worker.perform(subset: Page.wiki, pattern: /\/\/en\.wikipedia\.org(?!\/wiki\/User)/)
+loop do
+  unless interrupt
+    @worker.perform()
+  else
+    p "Exiting DownloadWorker..."
+    break
+  end
 end
-
-p "The end"
