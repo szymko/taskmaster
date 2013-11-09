@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 require_relative './app/app.rb'
 require 'pry'
 

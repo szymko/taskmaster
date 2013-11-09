@@ -21,27 +21,6 @@ class DownloadWorker
 
   private
 
-#  def fetch(subset)
-#    @page_update.fetch(subset: subset, number: 50)
-#  end
-#
-#  def get(pages)
-#    @crawler.get(pages.map(&:url))
-#  end
-#
-#  def scrap(pattern)
-#    @crawler.scrap(pattern)
-#  end
-#
-#  def insert(urls)
-#    @page_update.insert(urls: urls)
-#  end
-#
-#  def update(pages)
-#    @page_update.update(pages: pages, responses: @crawler.responses,
-#                        errors: @crawler.errors)
-#  end
-#
   def inform()
     TaskLogger.log(level: :info, msg: @steps.pop)
   end

@@ -1,5 +1,3 @@
-require 'uri'
-
 class InsertPages
 
   def perform(**opts)
