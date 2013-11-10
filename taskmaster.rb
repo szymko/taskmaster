@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 require_relative './app/app.rb'
-require 'pry'
 
 interrupt = false
 interrupt_co = 0
@@ -21,17 +20,17 @@ end
 
 commands = [FetchPages.new(subset: Page.wiki),
             GetPages.new(),
-            ScrapUrls.new(pattern: Regexp.compile(TaskmasterConfig[:crawler][:url_pattern])),
-            InsertPages.new(),
+            #ScrapUrls.new(pattern: Regexp.compile(TaskmasterConfig[:crawler][:url_pattern])),
+            #InsertPages.new(),
             UpdatePages.new()]
 
-@worker = DownloadWorker.new(commands)
+worker = GenericWorker.new("DownloadWorker", commands)
 
 loop do
   unless interrupt
-    @worker.perform()
+    worker.perform()
   else
-    p "Exiting DownloadWorker..."
+    p "Exiting Download..."
     break
   end
 end

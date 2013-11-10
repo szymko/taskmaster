@@ -13,10 +13,10 @@ class Neo4rubyClient
     @conn.close
   end
 
-  def call(article, uid)
-    correlation_id = uid || generate_uuid(article)
+  def call(page, uid = nil)
+    correlation_id = (uid || generate_uuid(page))
 
-    @exchange.publish(article,
+    @exchange.publish(page,
       :routing_key    => @server_queue,
       :correlation_id => correlation_id,
       :reply_to       => @reply_queue.name)

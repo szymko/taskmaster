@@ -1,7 +1,9 @@
 crawler:
   connections: 20
   fetch_limit: 20
-  url_pattern: '\/\/en\.wikipedia\.org(?!\/wiki\/User)'
+  url_pattern: '\/\/en\.wikipedia\.org\/wiki\/(?!\/|[A-Za-z]+:)'
+queue:
+  limit: 50
 logger:
   file: 'log/development.log'
   enabled: true

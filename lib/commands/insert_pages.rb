@@ -16,6 +16,6 @@ class InsertPages
   private
 
   def uniformize_url(u)
-    UrlUtility.add_slash(UrlUtility.remove_fragment(u))
+    UrlUtility.remove_fragment(u)
   end
 end

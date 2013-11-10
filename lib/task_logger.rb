@@ -5,7 +5,7 @@ class TaskLogger
   include Singleton
 
   def log(level: 'info', msg: '')
-    build_logger()
+    build_logger() unless @logger
     @logger.send(level.to_sym) { msg }
   end
 
@@ -23,6 +23,6 @@ class TaskLogger
 
   def build_logger
     logger_path = File.join(PROJECT_ROOT, TaskmasterConfig[:logger][:file])
-    @logger ||= Logger.new(logger_path)
+    @logger = Logger.new(logger_path)
   end
 end

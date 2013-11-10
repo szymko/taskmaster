@@ -1,13 +1,14 @@
-class DownloadWorker
+class GenericWorker
 
   attr_accessor :commands
 
-  def initialize(commands)
+  def initialize(name, commands)
+    @name = name
     @commands = commands
   end
 
   def perform()
-    TaskLogger.log(level: :debug, msg: "Starting DownloadWorker job.")
+    TaskLogger.log(level: :debug, msg: "Starting #{@name} job.")
     shared = {}
 
     @commands.each do |c|
@@ -16,12 +17,7 @@ class DownloadWorker
       shared.merge!(c.perform(shared))
     end
 
-    TaskLogger.log(level: :debug, msg: "DownloadWorker job done.")
+    TaskLogger.log(level: :debug, msg: "#{@name} job done.")
   end
 
-  private
-
-  def inform()
-    TaskLogger.log(level: :info, msg: @steps.pop)
-  end
 end

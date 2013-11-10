@@ -1,18 +1,14 @@
 #!/usr/bin/env ruby
-require_relative './lib/neo4ruby_client'
+require_relative './app/app'
 
 client = Neo4rubyClient.new
 client.open("neo4ruby")
+converter = HtmlTextConverter.new(TextJsonConverter.new(), xpath: "//body",
+                                  strategy: BareTextStrategy.new)
 
-fetched = PageContent.not_published.limit(50)
-not_published = []
-published = []
+commands = [ FetchPageContents.new(limit: TaskmasterConfig[:queue][:limit]),
+             CallClient.new(converter: converter, client: client),
+             UpdatePageContents.new ]
 
-fetched.each do |p|
-  (client.call(Parser.parse(p.body), p.id) == true ? published : not_published) << p
-end
-
-ensure
-  PageContent.where(id: published.map(&:id)).update_all({ published: true })
-  client.close
-end
+worker = GenericWorker.new("PublishWorker", commands)
+worker.perform()

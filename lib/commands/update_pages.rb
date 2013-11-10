@@ -1,8 +1,10 @@
+require 'pry'
 class UpdatePages
 
   def perform(**opts)
     opts[:pages].each do |p|
       res = responses(opts).find { |r| p.url == r.url.to_s }
+#      binding.pry
       success?(res) ? insert_response(p, res) : insert_error(p, res)
       p.save
     end
@@ -16,9 +18,9 @@ class UpdatePages
     opts[:crawler].responses
   end
 
-  def message(opts) #opts => { url: ,status_code: , type: }
+  def message(opts) #opts => { url: ,code: , type: }
     "Page update #{opts[:type]} with url: #{opts[:url]} "\
-    "and status_code: #{opts[:status_code]}."
+    "and status_code: #{opts[:code]}."
   end
 
   def insert_response(page, response)

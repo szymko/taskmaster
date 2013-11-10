@@ -28,10 +28,5 @@ describe InsertPages do
       url = "http://www.example.com/"
       expect { subject.perform(urls: [url, "#{url}#frag"]) }.to change { Page.count }.by(1)
     end
-
-    it "adds slashes to urls" do
-      subject.perform(urls: ["http://www.s.com"])
-      expect(Page.last.url).to eq("http://www.s.com/")
-    end
   end
 end
