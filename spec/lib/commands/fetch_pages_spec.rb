@@ -10,14 +10,14 @@ describe FetchPages do
 
   context "given db is not empty" do
     describe "#perform" do
-      it "performes requested number of pages" do
+      it "performs requested number of pages" do
         5.times { FactoryGirl.create(:page, status: "waiting") }
         fp = FetchPages.new(number: 3)
 
         expect(fp.perform[:pages].length).to eq(3)
       end
 
-      it "performes a specific page" do
+      it "performs a specific page" do
         FactoryGirl.create(:page, status: "waiting",
                             url: "http://www.example.com")
         fp = FetchPages.new(number: 1)
@@ -33,7 +33,7 @@ describe FetchPages do
         expect(fp.perform()[:pages].first.status).to eq("running")
       end
 
-      it "performes from a subset" do
+      it "performs from a subset" do
         FactoryGirl.create(:page, status: "waiting")
         FactoryGirl.create(:page, status: "waiting",
                             url: "http://www.instance.com")

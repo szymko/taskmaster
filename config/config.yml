@@ -3,7 +3,7 @@ crawler:
   fetch_limit: 20
   url_pattern: '\/\/en\.wikipedia\.org\/wiki\/(?!\/|[A-Za-z]+:)'
 queue:
-  limit: 50
+  limit: 1
 logger:
   file: 'log/development.log'
   enabled: true

@@ -3,14 +3,17 @@ require_relative './app/app'
 
 client = Neo4rubyClient.new
 client.open("neo4ruby")
-converter = HtmlTextConverter.new(TextJsonConverter.new(), xpath: "//h1 | //h2 | //h3 | //h4 | //h5 | //p",
-                                  strategy: BareTextStrategy.new)
+converter = HtmlTextConverter.new(TextJsonConverter.new(),
+                                  strategy: ObligatoryOptionalStrategy.new(
+                                    obligatory_path: "//h1 | //h2 | //h3 | //h4 | //h5",
+                                    optional_path: "//p"))
 
-commands = [ FetchPageContents.new(limit: TaskmasterConfig[:queue][:limit]),
-             CallClient.new(converter: converter, client: client),
-             UpdatePageContents.new ]
+commands = [FetchPageContents.new(limit: TaskmasterConfig[:queue][:limit]),
+            CallClient.new(converter: converter, client: client),
+            UpdatePageContents.new]
 
 worker = GenericWorker.new("PublishWorker", commands)
-worker.perform()
+
+20.times { worker.perform() }
 
 client.close
