@@ -1,10 +1,8 @@
-require 'pry'
 class UpdatePages
 
   def perform(**opts)
     opts[:pages].each do |p|
       res = responses(opts).find { |r| p.url == r.url.to_s }
-#      binding.pry
       success?(res) ? insert_response(p, res) : insert_error(p, res)
       p.save
     end

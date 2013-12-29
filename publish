@@ -3,7 +3,7 @@ require_relative './app/app'
 
 client = Neo4rubyClient.new
 client.open("neo4ruby")
-converter = HtmlTextConverter.new(TextJsonConverter.new(), xpath: "//body",
+converter = HtmlTextConverter.new(TextJsonConverter.new(), xpath: "//h1 | //h2 | //h3 | //h4 | //h5 | //p",
                                   strategy: BareTextStrategy.new)
 
 commands = [ FetchPageContents.new(limit: TaskmasterConfig[:queue][:limit]),
@@ -12,3 +12,5 @@ commands = [ FetchPageContents.new(limit: TaskmasterConfig[:queue][:limit]),
 
 worker = GenericWorker.new("PublishWorker", commands)
 worker.perform()
+
+client.close

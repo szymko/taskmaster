@@ -1,5 +1,6 @@
 require 'logger'
 require 'singleton'
+require 'fileutils'
 
 class TaskLogger
   include Singleton
@@ -23,6 +24,7 @@ class TaskLogger
 
   def build_logger
     logger_path = File.join(PROJECT_ROOT, TaskmasterConfig[:logger][:file])
+    FileUtils.touch(logger_path)
     @logger = Logger.new(logger_path)
   end
 end

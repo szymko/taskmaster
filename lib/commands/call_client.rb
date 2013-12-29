@@ -4,7 +4,7 @@ class CallClient
   end
 
   def perform(**opts)
-    published = opts[:page_contents].inject([]) do |p, pc|
+    published = opts[:page_contents].reduce([]) do |p, pc|
       p << pc if publish(pc)
     end
 
@@ -15,6 +15,7 @@ class CallClient
 
   def publish(page_content)
     content = { url: page_content.page.url, body: page_content.body }
+    TaskLogger.log(level: :debug, msg: "Publishing page url: #{content[:url]}...")
     @client.call(@converter.convert(content))
   end
 end

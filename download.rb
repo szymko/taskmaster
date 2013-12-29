@@ -20,15 +20,20 @@ end
 
 commands = [FetchPages.new(subset: Page.wiki),
             GetPages.new(),
-            #ScrapUrls.new(pattern: Regexp.compile(TaskmasterConfig[:crawler][:url_pattern])),
-            #InsertPages.new(),
+            ScrapUrls.new(pattern: Regexp.compile(TaskmasterConfig[:crawler][:url_pattern])),
+            InsertPages.new(),
             UpdatePages.new()]
 
-worker = GenericWorker.new("DownloadWorker", commands)
+scrapping_worker = GenericWorker.new("DownloadAndScrappingWorker", commands)
+non_scrapping_worker = GenericWorker.new("DownloadWorker", commands.values_at(0,1,4))
 
 loop do
   unless interrupt
-    worker.perform()
+    if Page.success.count > (0.4 * Page.waiting.count)
+      scrapping_worker.perform()
+    else
+      non_scrapping_worker.perform()
+    end
   else
     p "Exiting Download..."
     break
