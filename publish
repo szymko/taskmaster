@@ -6,7 +6,7 @@ client.open("neo4ruby")
 converter = HtmlTextConverter.new(TextJsonConverter.new(),
                                   strategy: ObligatoryOptionalStrategy.new(
                                     obligatory_path: "//h1 | //h2 | //h3 | //h4 | //h5",
-                                    optional_path: "//p"))
+                                    optional_path: "//p/a | //p"))
 
 commands = [FetchPageContents.new(limit: TaskmasterConfig[:queue][:limit]),
             CallClient.new(converter: converter, client: client),
