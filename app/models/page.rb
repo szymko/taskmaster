@@ -1,5 +1,5 @@
 class Page < ActiveRecord::Base
-  has_one :page_content, :class_name => "PageContent", :dependent => :destroy
+  has_many :page_contents, :class_name => "PageContent", :dependent => :destroy
 
   validates :url, :presence => true
   validates :url, :uniqueness => true
@@ -16,6 +16,19 @@ class Page < ActiveRecord::Base
   def mark_as(status)
     raise ArgumentError unless STATUSES.member?(status.to_s)
     self.status = status.to_s
+    save
+  end
+
+  def page_content
+    page_contents.first
+  end
+
+  def page_content=(val)
+    page_contents.first = val
+  end
+
+  def create_page_content(attrs)
+    page_contents << PageContent.new(attrs)
     save
   end
 end

@@ -6,7 +6,6 @@ namespace :db do
   desc "Migrate the db"
   task :migrate do
     Connection.establish()
-    p Page.inspect
     ActiveRecord::Migrator.migrate("db/migrate/")
   end
 

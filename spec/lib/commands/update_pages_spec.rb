@@ -25,7 +25,7 @@ describe UpdatePages do
         up.perform(pages: [page], crawler: cr)
 
         expect(page.page_content.body).to eq(response.body)
-        expect(page.page_content.status_code).to eq(response.status_code)
+        expect(page.page_content.status_code.to_i).to eq(response.status_code)
       end
     end
   end

@@ -14,8 +14,8 @@ trap("SIGINT") do
 end
 
 
-unless Page.find_by(url: "http://en.wikipedia.org/wiki/Main_Page")
-  Page.create(url: "http://en.wikipedia.org/wiki/Main_Page", status: "waiting")
+unless Page.find_by(url: TaskmasterConfig[:crawler][:starting_page])
+  Page.create(url: TaskmasterConfig[:crawler][:starting_page], status: "waiting")
 end
 
 commands = [FetchPages.new(subset: Page.wiki),
@@ -34,6 +34,7 @@ loop do
     else
       non_scrapping_worker.perform()
     end
+    wait TaskmasterConfig[:crawler][:request_gap].to_f if TaskmasterConfigp[:crawler][:polite]
   else
     p "Exiting Download..."
     break
